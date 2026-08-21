@@ -15,6 +15,14 @@ class BillingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateItem(
+    int index,
+    BillItem updatedItem,
+  ) {
+    items[index] = updatedItem;
+    notifyListeners();
+  }
+
   double get total =>
       items.fold(
         0,
