@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../models/worker.dart';
+
 class AddWorkerScreen extends StatefulWidget {
   const AddWorkerScreen({super.key});
 
@@ -44,7 +46,12 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       return;
     }
 
-    Navigator.of(context).pop();
+    final worker = Worker(
+      name: name,
+      hourlyRate: hourlyRate,
+    );
+
+    Navigator.of(context).pop(worker);
   }
 
   void _showMessage(String message) {
@@ -61,10 +68,10 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('કર્મચારી ઉમેરો'),
       ),
-      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         keyboardDismissBehavior:
             ScrollViewKeyboardDismissBehavior.onDrag,
