@@ -5,38 +5,28 @@ import '../../models/item.dart';
 import '../../models/bill_item.dart';
 
 class BillingInputSection extends StatefulWidget {
-  final void Function(BillItem item) onAddItem;
+  final void Function(BillItem item, String customerName) onAddItem;
 
-  const BillingInputSection({
-    super.key,
-    required this.onAddItem,
-  });
+  const BillingInputSection({super.key, required this.onAddItem});
 
   @override
-  State<BillingInputSection> createState() =>
-      _BillingInputSectionState();
+  State<BillingInputSection> createState() => _BillingInputSectionState();
 }
 
-class _BillingInputSectionState
-    extends State<BillingInputSection> {
-  final TextEditingController customerController =
-      TextEditingController();
+class _BillingInputSectionState extends State<BillingInputSection> {
+  final TextEditingController customerController = TextEditingController();
 
-  final TextEditingController searchController =
-      TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
-  final TextEditingController quantityController =
-      TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
 
-  final TextEditingController priceController =
-      TextEditingController();
+  final TextEditingController priceController = TextEditingController();
 
   final FocusNode searchFocus = FocusNode();
   final FocusNode quantityFocus = FocusNode();
   final FocusNode priceFocus = FocusNode();
 
-  final ItemController itemController =
-      ItemController();
+  final ItemController itemController = ItemController();
 
   Item? selectedItem;
   List<Item> searchResults = [];
@@ -89,27 +79,21 @@ class _BillingInputSectionState
       }
 
       searchResults = itemController.items.where((item) {
-        final englishName =
-            item.searchName.toLowerCase();
+        final englishName = item.searchName.toLowerCase();
 
-        final gujaratiName =
-            item.gujaratiName.toLowerCase();
+        final gujaratiName = item.gujaratiName.toLowerCase();
 
-        return englishName.startsWith(query) ||
-            gujaratiName.startsWith(query);
+        return englishName.startsWith(query) || gujaratiName.startsWith(query);
       }).toList();
     });
   }
 
   void addItem() {
-    final customerName =
-        customerController.text.trim();
+    final customerName = customerController.text.trim();
 
-    final quantityText =
-        quantityController.text.trim();
+    final quantityText = quantityController.text.trim();
 
-    final priceText =
-        priceController.text.trim();
+    final priceText = priceController.text.trim();
 
     if (customerName.isEmpty) {
       _showMessage('ગ્રાહકનું નામ દાખલ કરો.');
@@ -122,8 +106,7 @@ class _BillingInputSectionState
       return;
     }
 
-    final quantity =
-        int.tryParse(quantityText);
+    final quantity = int.tryParse(quantityText);
 
     if (quantity == null || quantity <= 0) {
       _showMessage('યોગ્ય જથ્થો દાખલ કરો.');
@@ -131,8 +114,7 @@ class _BillingInputSectionState
       return;
     }
 
-    final price =
-        double.tryParse(priceText);
+    final price = double.tryParse(priceText);
 
     if (price == null || price <= 0) {
       _showMessage('યોગ્ય ભાવ દાખલ કરો.');
@@ -141,15 +123,13 @@ class _BillingInputSectionState
     }
 
     final BillItem item = BillItem(
-      gujaratiName:
-          selectedItem!.gujaratiName,
-      englishSearchName:
-          selectedItem!.searchName,
+      gujaratiName: selectedItem!.gujaratiName,
+      englishSearchName: selectedItem!.searchName,
       quantity: quantity,
       price: price,
     );
 
-    widget.onAddItem(item);
+    widget.onAddItem(item, customerName);
 
     searchController.clear();
     quantityController.clear();
@@ -167,11 +147,7 @@ class _BillingInputSectionState
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration:
-              const Duration(seconds: 2),
-        ),
+        SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
   }
 
@@ -180,29 +156,21 @@ class _BillingInputSectionState
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'ગ્રાહકનું નામ',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 8),
 
           TextField(
             controller: customerController,
-            textInputAction:
-                TextInputAction.next,
-            decoration:
-                const InputDecoration(
-              hintText:
-                  'ગ્રાહકનું નામ દાખલ કરો',
-              border:
-                  OutlineInputBorder(),
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              hintText: 'ગ્રાહકનું નામ દાખલ કરો',
+              border: OutlineInputBorder(),
             ),
             onSubmitted: (_) {
               searchFocus.requestFocus();
@@ -213,10 +181,7 @@ class _BillingInputSectionState
 
           const Text(
             'વસ્તુ શોધો',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 8),
@@ -224,72 +189,45 @@ class _BillingInputSectionState
           TextField(
             controller: searchController,
             focusNode: searchFocus,
-            textInputAction:
-                TextInputAction.next,
-            decoration:
-                const InputDecoration(
-              hintText:
-                  'વસ્તુનું નામ શોધો',
-              prefixIcon:
-                  Icon(Icons.search),
-              border:
-                  OutlineInputBorder(),
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              hintText: 'વસ્તુનું નામ શોધો',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(),
             ),
             onChanged: searchItems,
             onSubmitted: (_) {
               if (searchResults.length == 1) {
-                selectItem(
-                  searchResults.first,
-                );
+                selectItem(searchResults.first);
               } else if (searchResults.length > 1) {
-                _showMessage(
-                  'વસ્તુ પસંદ કરો.',
-                );
+                _showMessage('વસ્તુ પસંદ કરો.');
               }
             },
           ),
 
           if (searchResults.isNotEmpty)
             Container(
-              margin:
-                  const EdgeInsets.only(
-                top: 4,
-              ),
-              decoration:
-                  BoxDecoration(
-                border: Border.all(
-                  color:
-                      Colors.grey.shade300,
-                ),
-                borderRadius:
-                    BorderRadius.circular(
-                  8,
-                ),
+              margin: const EdgeInsets.only(top: 4),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: ListView.builder(
                 shrinkWrap: true,
-                physics:
-                    const NeverScrollableScrollPhysics(),
-                itemCount:
-                    searchResults.length,
-                itemBuilder:
-                    (context, index) {
-                  final item =
-                      searchResults[index];
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: searchResults.length,
+                itemBuilder: (context, index) {
+                  final item = searchResults[index];
 
                   return ListTile(
                     title: Text(
                       item.gujaratiName,
-                      style:
-                          const TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
-                        fontWeight:
-                            FontWeight.w500,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    subtitle: Text(
-                      item.searchName,
-                    ),
+                    subtitle: Text(item.searchName),
                     onTap: () {
                       selectItem(item);
                     },
@@ -304,38 +242,29 @@ class _BillingInputSectionState
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'જથ્થો',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight:
-                            FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
 
                     const SizedBox(height: 8),
 
                     TextField(
-                      controller:
-                          quantityController,
-                      focusNode:
-                          quantityFocus,
-                      keyboardType:
-                          TextInputType.number,
-                      textInputAction:
-                          TextInputAction.next,
-                      decoration:
-                          const InputDecoration(
+                      controller: quantityController,
+                      focusNode: quantityFocus,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
                         hintText: 'જથ્થો',
-                        border:
-                            OutlineInputBorder(),
+                        border: OutlineInputBorder(),
                       ),
                       onSubmitted: (_) {
-                        priceFocus
-                            .requestFocus();
+                        priceFocus.requestFocus();
                       },
                     ),
                   ],
@@ -346,37 +275,28 @@ class _BillingInputSectionState
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'ભાવ',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight:
-                            FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
 
                     const SizedBox(height: 8),
 
                     TextField(
-                      controller:
-                          priceController,
-                      focusNode:
-                          priceFocus,
-                      keyboardType:
-                          const TextInputType
-                              .numberWithOptions(
+                      controller: priceController,
+                      focusNode: priceFocus,
+                      keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      textInputAction:
-                          TextInputAction.done,
-                      decoration:
-                          const InputDecoration(
+                      textInputAction: TextInputAction.done,
+                      decoration: const InputDecoration(
                         hintText: 'ભાવ',
-                        border:
-                            OutlineInputBorder(),
+                        border: OutlineInputBorder(),
                       ),
                       onSubmitted: (_) {
                         addItem();
@@ -395,16 +315,10 @@ class _BillingInputSectionState
             height: 52,
             child: ElevatedButton.icon(
               onPressed: addItem,
-              icon: const Icon(
-                Icons.add,
-              ),
+              icon: const Icon(Icons.add),
               label: const Text(
                 'ઉમેરો',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight:
-                      FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
               ),
             ),
           ),
