@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../database/app_database.dart';
+import '../data/sample_items.dart';
 import '../models/item.dart';
 
 class ItemController extends ChangeNotifier {
@@ -9,10 +10,31 @@ class ItemController extends ChangeNotifier {
   Future<void> loadItems() async {
     final db = await AppDatabase.instance.database;
 
-    final data = await db.query(
+    // Check whether items already exist in the database
+    var data = await db.query(
       'items',
       orderBy: 'id ASC',
     );
+
+    // If the database is empty, add all sample items
+    if (data.isEmpty) {
+      for (final item in sampleItems) {
+        await db.insert(
+          'items',
+          {
+            'gujarati_name': item.gujaratiName,
+            'search_name': item.searchName,
+            'price': item.price,
+          },
+        );
+      }
+
+      // Load the items again after inserting them
+      data = await db.query(
+        'items',
+        orderBy: 'id ASC',
+      );
+    }
 
     items.clear();
 
