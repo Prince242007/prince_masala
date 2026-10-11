@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/home/home_action_button.dart';
 import '../../core/theme/app_colors.dart';
 import '../../app/routes.dart';
+import '../../controllers/daily_bill_summary_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,44 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _getDayName(int weekday) {
+    const days = [
+      "સોમવાર",
+      "મંગળવાર",
+      "બુધવાર",
+      "ગુરુવાર",
+      "શુક્રવાર",
+      "શનિવાર",
+      "રવિવાર",
+    ];
+
+    return days[weekday - 1];
+  }
+
+  final DailyBillSummaryController dailyBillSummaryController =
+      DailyBillSummaryController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadTodaySummary();
+  }
+
+  Future<void> _loadTodaySummary() async {
+    await dailyBillSummaryController.loadTodayTotal();
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    dailyBillSummaryController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,26 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               "Prince Masala",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Text(
-              "Prince Spices & Dryfruits",
-              style: TextStyle(
-                fontSize: 13,
-              ),
-            ),
+            Text("Prince Spices & Dryfruits", style: TextStyle(fontSize: 13)),
           ],
         ),
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.settings,
-              );
+              Navigator.pushNamed(context, AppRoutes.settings);
             },
             icon: const Icon(Icons.settings),
           ),
@@ -55,22 +83,49 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "નમસ્તે 👋",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
 
-              const Text(
-                "નમસ્તે 👋",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+                      SizedBox(height: 6),
 
-              const SizedBox(height: 6),
+                      Text("આજે સ્વાગત છે.", style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
 
-              const Text(
-                "આજે સ્વાગત છે.",
-                style: TextStyle(
-                  fontSize: 16,
-                ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        _getDayName(DateTime.now().weekday),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Text(
+                        "${DateTime.now().day.toString().padLeft(2, '0')}/"
+                        "${DateTime.now().month.toString().padLeft(2, '0')}/"
+                        "${DateTime.now().year}",
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
               ),
 
               const SizedBox(height: 30),
@@ -78,11 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
               HomeActionButton(
                 icon: Icons.receipt_long,
                 title: "નવું બિલ",
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.billing,
-                  );
+                onTap: () async {
+                  await Navigator.pushNamed(context, AppRoutes.billing);
+
+                  // Billing screenમાંથી પાછા આવ્યા પછી
+                  // today's summary ફરીથી load થશે.
+                  await _loadTodaySummary();
                 },
               ),
 
@@ -92,10 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.pending_actions,
                 title: "બાકી બિલ",
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.pending,
-                  );
+                  Navigator.pushNamed(context, AppRoutes.pending);
                 },
               ),
 
@@ -105,10 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.inventory_2,
                 title: "વસ્તુઓ",
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.items,
-                  );
+                  Navigator.pushNamed(context, AppRoutes.items);
                 },
               ),
 
@@ -118,10 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.people,
                 title: "કર્મચારી પગાર",
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.salary,
-                  );
+                  Navigator.pushNamed(context, AppRoutes.salary);
                 },
               ),
 
@@ -135,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-
                       const Text(
                         "આજનો સારાંશ",
                         style: TextStyle(
@@ -147,19 +193,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 15),
 
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                        children: const [
-
-                          Text(
-                            "બિલ",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                        children: [
+                          const Text("બિલ", style: TextStyle(fontSize: 16)),
 
                           Text(
                             "0",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -170,19 +211,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 10),
 
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                        children: const [
-
-                          Text(
-                            "રકમ",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                        children: [
+                          const Text("રકમ", style: TextStyle(fontSize: 16)),
 
                           Text(
-                            "₹0",
-                            style: TextStyle(
+                            "₹${dailyBillSummaryController.todayTotal.toStringAsFixed(2)}",
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
